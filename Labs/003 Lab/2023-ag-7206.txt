@@ -1,0 +1,568 @@
+// main.dart: 
+
+import 'package:flutter/material.dart';
+import 'package:lab3/mydice.dart';
+import 'package:lab3/splash.dart';
+
+void main() {
+  runApp(Routing());
+}
+
+class Routing extends StatelessWidget {
+  const Routing({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: splash(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          //
+          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+          // action in the IDE, or press "p" in the console), to see the
+          // wireframe for each widget.
+          mainAxisAlignment: .center,
+          children: [
+            const Text('You have pushed the button this many times:'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+
+
+--------------------------------------------------------------------------------
+
+// splash.dart: 
+
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:lab3/mydice.dart';
+class splash extends StatefulWidget {
+  const splash({super.key});
+
+  @override
+  State<splash> createState() => _splashState();
+}
+
+class _splashState extends State<splash> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Timer(
+      Duration(seconds: 10),
+        ()=>Navigator.push(
+            context, MaterialPageRoute(builder: (context)=> mydice()))
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: MaterialApp(
+        home: Scaffold(
+          backgroundColor: Colors.pink,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.black,
+                  radius: 100,
+                  backgroundImage: AssetImage('images/DESKSTOP.PNG'),
+                ),
+                Text(
+                    'Muhammad Hamid Raza\nBscs 6th E\n2023-ag-7206',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'font1',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20,),
+                CircularProgressIndicator(color: Colors.white,)
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+---------------------------------------------------------------------------------
+
+// mydice.dart:
+
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+class mydice extends StatefulWidget {
+  const mydice({super.key});
+
+  @override
+  State<mydice> createState() => _mydiceState();
+}
+
+class _mydiceState extends State<mydice> {
+  int First_Dice=1;
+  int Second_Dice=1;
+  int Third_Dice=1;
+  int Forth_Dice=1;
+  
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.purple,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      First_Dice= Random().nextInt(6)+1;
+                      print('$First_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$First_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5,),
+            Text('2023-ag-7206',
+              style: TextStyle(
+                fontFamily: 'font1',
+                fontSize: 12,
+              ),
+            ),
+            SizedBox(height: 5,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Second_Dice= Random().nextInt(6)+1;
+                      print('$Second_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Second_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Second_Dice= Random().nextInt(6)+1;
+                      print('$Second_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Second_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                    width: 70,
+                      image: AssetImage('images/$Third_Dice.png'),
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Third_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Third_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Forth_Dice= Random().nextInt(6)+1;
+                      print('$Forth_Dice');
+                    });
+                  },
+                  child: Image(
+                    height: 70,
+                    width: 70,
+                    image: AssetImage('images/$Forth_Dice.png'),
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Forth_Dice= Random().nextInt(6)+1;
+                      print('$Forth_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Forth_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Forth_Dice= Random().nextInt(6)+1;
+                      print('$Forth_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Forth_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Forth_Dice= Random().nextInt(6)+1;
+                      print('$Forth_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Forth_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                    height: 70,
+                    width: 70,
+                    image: AssetImage('images/$Third_Dice.png'),
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Third_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Third_Dice= Random().nextInt(6)+1;
+                      print('$Third_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Third_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Second_Dice= Random().nextInt(6)+1;
+                      print('$Second_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Second_Dice.png')
+                  ),
+                ),
+                SizedBox(width: 10,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Second_Dice= Random().nextInt(6)+1;
+                      print('$Second_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$Second_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5,),
+            Text('Muhammad Hamid Raza',
+              style: TextStyle(
+                fontFamily: 'font1',
+                fontSize: 12,
+              ),
+            ),
+            SizedBox(height: 5,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      First_Dice= Random().nextInt(6)+1;
+                      print('$First_Dice');
+                    });
+                  },
+                  child: Image(
+                      height: 70,
+                      width: 70,
+                      image: AssetImage('images/$First_Dice.png')
+                  ),
+                ),
+              ],
+            ),
+          ],
+        )
+      ),
+    );
+  }
+}
+
+
+---------------------------------------------------------------------------
+
+// pubspec.yaml: 
+
+name: lab3
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - images/
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: font1
+      fonts:
+        - asset: fonts/GoogleSans-Italic-VariableFont_GRAD,opsz,wght.ttf
+
+  # see https://flutter.dev/to/font-from-package
