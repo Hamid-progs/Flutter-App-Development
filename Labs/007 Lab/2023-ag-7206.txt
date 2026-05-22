@@ -1,0 +1,389 @@
+main.dart:import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lab7/splash.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://gvawyzvsyfkqegtcsppm.supabase.co',
+    anonKey: 'sb_publishable_nJEZn6lIejGF7cPAWKIHNg_2m9o8yPH',
+  );
+
+  runApp(const Routing());
+}
+
+class Routing extends StatelessWidget {
+  const Routing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Splash(),
+    );
+  }
+}
+
+----------------------------------------------------------------
+splash.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lab7/login.dart';
+import 'package:lab7/home.dart';
+
+class Splash extends StatefulWidget {
+  const Splash({super.key});
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  final result = Supabase.instance.client;
+
+  Future<void> loading() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (!mounted) return;
+
+    if (result.auth.currentSession == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Myhome()),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loading();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.yellow,
+      body: Center(
+        child: FlutterLogo(size: 70),
+      ),
+    );
+  }
+}
+
+--------------------------------------------------------------
+home.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lab7/login.dart';
+
+class Myhome extends StatefulWidget {
+  const Myhome({super.key});
+
+  @override
+  State<Myhome> createState() => _MyhomeState();
+}
+
+class _MyhomeState extends State<Myhome> {
+  final result = Supabase.instance.client.auth;
+
+  Future<void> logout() async {
+    await result.signOut();
+
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Muhammad Hamid Raza",
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: logout,
+              child: const Text(
+                'Logout',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              '2023-ag-7206',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+------------------------------------------------------------------------
+login.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lab7/signup.dart';
+import 'package:lab7/home.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final EmailText = TextEditingController();
+  final PasswordText = TextEditingController();
+
+  bool flag = false;
+
+  final LoginObject = Supabase.instance.client;
+
+  Future<void> LoginFunction() async {
+    setState(() {
+      flag = true;
+    });
+
+    try {
+      final result = await LoginObject.auth.signInWithPassword(
+        email: EmailText.text.trim(),
+        password: PasswordText.text.trim(),
+      );
+
+      if (result.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login Successful!'),
+          ),
+        );
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const Myhome()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        flag = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    EmailText.dispose();
+    PasswordText.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.pink,
+        title: const Text('Sign In'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            TextField(
+              controller: EmailText,
+              decoration: const InputDecoration(
+                hintText: 'Enter Your Email',
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: PasswordText,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'Enter Your Password',
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            flag
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+              onPressed: LoginFunction,
+              child: const Text('Login'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SignUpscreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                "Don't have an account? Sign Up",
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+--------------------------------------------------------------------
+signup.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lab7/login.dart';
+import 'package:lab7/home.dart';
+
+class SignUpscreen extends StatefulWidget {
+  const SignUpscreen({super.key});
+
+  @override
+  State<SignUpscreen> createState() => _SignUpscreenState();
+}
+
+class _SignUpscreenState extends State<SignUpscreen> {
+  final EmailText = TextEditingController();
+  final PasswordText = TextEditingController();
+
+  bool flag = false;
+
+  final LoginObject = Supabase.instance.client;
+
+  Future<void> SignUpFunction() async {
+    setState(() {
+      flag = true;
+    });
+
+    try {
+      final result = await LoginObject.auth.signUp(
+        email: EmailText.text.trim(),
+        password: PasswordText.text.trim(),
+      );
+
+      if (result.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signup Successful!'),
+          ),
+        );
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        flag = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    EmailText.dispose();
+    PasswordText.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.pink,
+        title: const Text('Sign Up'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            TextField(
+              controller: EmailText,
+              decoration: const InputDecoration(
+                hintText: 'Enter Your Email',
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: PasswordText,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'Enter Your Password',
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            flag
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+              onPressed: SignUpFunction,
+              child: const Text('Sign Up'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'Already have an account? Sign In',
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

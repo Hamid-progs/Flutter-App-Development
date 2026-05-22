@@ -1,0 +1,287 @@
+//main.dart 
+
+import 'package:assign5/quizhome.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(Routing());
+}
+
+class Routing extends StatelessWidget {
+  const Routing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Quizhome(),
+    );
+  }
+}
+
+---------------------------------------------------------------------------------
+//quizhome.dart 
+
+
+import 'package:assign5/Myresult.dart';
+import 'package:flutter/material.dart';
+import 'questionbank.dart';
+
+class Quizhome extends StatefulWidget {
+  const Quizhome({super.key});
+
+  @override
+  State<Quizhome> createState() => _QuizhomeState();
+}
+
+class _QuizhomeState extends State<Quizhome> {
+  List<Icon> Icon_List = [];
+  int marks = 0;
+  Questionbank QA = Questionbank();
+
+  //check statment
+  QuestionChecking(bool UserSelectedAnswer) {
+    if (QA.GetAnswer() == UserSelectedAnswer) {
+      marks = marks + 5;
+      Icon_List.add(Icon(Icons.check, color: Colors.green, size: 40));
+    } else {
+      Icon_List.add(Icon(Icons.close, color: Colors.red, size: 40));
+    }
+  }
+
+  QuizStatus(bool UserSelectedAnswer) {
+    if (QA.QuizStatus() == true) {
+      QuestionChecking(UserSelectedAnswer);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Myresult(marks, Icon_List.length * 5),
+        ),
+      );
+    } else {
+      QuestionChecking(UserSelectedAnswer);
+      QA.NextQuetion();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          title: Center(
+            child: Text(
+              '$marks',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Text(
+                  QA.GetQuestion()!,
+                  textAlign: TextAlign.center,
+
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  setState(() {
+                    QuizStatus(true);
+                  });
+                },
+                child: Text(
+                  'True',
+                  style: TextStyle(fontSize: 35, color: Colors.white),
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () {
+                  setState(() {
+                    QuizStatus(false);
+                  });
+                },
+                child: Text(
+                  'False',
+                  style: TextStyle(fontSize: 35, color: Colors.white),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: Icon_List,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+---------------------------------------------------------------------------------
+//questionbank.dart 
+
+
+import 'quizclass.dart';
+
+class Questionbank {
+  int count = 0;
+  List<Quizclass> QuestionCollection = [
+    Quizclass('Array indices in C start at 0.', true),
+    Quizclass('sizeof returns size in bytes.', true),
+    Quizclass('C supports function overloading.', false),
+    Quizclass('main() must return an int.', true),
+    Quizclass('Global variables are auto-initialized to 0.', true),
+    Quizclass('printf() is declared in <stdlib.h>', false),
+    Quizclass('Strings in C end with "slash-0".', true),
+    Quizclass('== can compare two strings in C.', false),
+    Quizclass("A void* can hold any data type's address.", true),
+    Quizclass('Local variables are stored on the heap.', false),
+    Quizclass('#define is processed at compile time', true),
+    Quizclass('A struct in C can contain functions.', false),
+    Quizclass('break can be used inside a switch block.', true),
+    Quizclass('A C function can return multiple values directly.', false),
+    Quizclass('% operator works on floating-point numbers.', false),
+    Quizclass('Escape sequence "slash-n" is a single character in C. ', true),
+    Quizclass('malloc() initializes memory to zero. ', false),
+    Quizclass('do-while loop always runs at least once.', true),
+    Quizclass('int and long are always different sizes.', false,),
+    Quizclass('A recursive function needs a base case. ', true),
+    Quizclass('continue skips to the next loop iteration.', true),
+    Quizclass('A char stores exactly one character. ', true),
+    Quizclass('NULL equals integer 0 in C.', true),
+    Quizclass('++ can be used on float variables. ', true),
+    Quizclass('C arrays automatically check for out-of-bounds access.', false),
+  ];
+
+  //method of getting question
+  String? GetQuestion() {
+    return QuestionCollection[count].QuestionStatement;
+  }
+
+  bool? GetAnswer() {
+    return QuestionCollection[count].AnswerStatement;
+  }
+
+  void NextQuetion() {
+    if (count < QuestionCollection.length) {
+      count = count + 1;
+    }
+  }
+
+  bool? QuizStatus() {
+    if (count >= QuestionCollection.length - 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+----------------------------------------------------------------------------------
+//quizclass.dart
+
+class Quizclass {
+  String? QuestionStatement;
+  bool? AnswerStatement;
+
+  //constructor
+  Quizclass(String QQ, bool AA) {
+    QuestionStatement = QQ;
+    AnswerStatement = AA;
+  }
+}
+
+---------------------------------------------------------------------------------
+//Myresult.dart 
+import 'package:assign5/quizhome.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class Myresult extends StatefulWidget {
+  var Get_marks;
+  var total_marks;
+
+  Myresult(this.Get_marks, this.total_marks);
+
+  @override
+  State<Myresult> createState() => _MyresultState();
+}
+
+class _MyresultState extends State<Myresult> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Your percentage is ' +
+                  (((widget.Get_marks / widget.total_marks) * 100)
+                      .toInt()
+                      .toString()) +
+                  '%.',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'You got ' +
+                  widget.Get_marks.toString() +
+                  ' marks out of ' +
+                  widget.total_marks.toString() +
+                  '.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () {
+                setState(() {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Quizhome()),
+                  );
+                });
+              },
+              child: Text(
+                'Retry!',
+
+                style: TextStyle(fontSize: 35, color: Colors.white),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              onPressed: () {
+                setState(() {
+                  SystemNavigator.pop();
+                });
+              },
+              child: Text(
+                'Exit',
+                style: TextStyle(fontSize: 35, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      )
+    );
+  }
+}
+
+----------------------------------------------------------------------------------
