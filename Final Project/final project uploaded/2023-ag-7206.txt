@@ -1,0 +1,2990 @@
+// pubspec.yaml:
+name: medistore
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  supabase_flutter: ^2.12.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
+
+----------------------------------------------------------------------------------
+//main.dart: 
+
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/splash.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://gvawyzvsyfkqegtcsppm.supabase.co',
+    anonKey: 'sb_publishable_nJEZn6lIejGF7cPAWKIHNg_2m9o8yPH',
+  );
+
+  runApp(Routing());
+}
+
+class Routing extends StatelessWidget {
+  const Routing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(debugShowCheckedModeBanner: false, home: Splash());
+  }
+}
+
+----------------------------------------------------------------------------------
+//splash.dart: 
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/login.dart';
+import 'package:medistore/home.dart';
+
+class Splash extends StatefulWidget {
+  const Splash({super.key});
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  final result = Supabase.instance.client;
+
+  loading() async {
+    await Future.delayed(Duration(seconds: 10));
+    if (result.auth.currentSession == null) {
+      setState(() {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+          (context) => false,
+        );
+      });
+    } else {
+      setState(() {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Home()),
+          (context) => false,
+        );
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loading();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF0F6E56),
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(26),
+                  color: Colors.white,
+                ),
+                child: Icon(
+                  Icons.local_hospital_rounded,
+                  color: Color(0xFF0F6E56),
+                  size: 60,
+                ),
+              ),
+              SizedBox(height: 24),
+              Text(
+                'MediStore',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Your Health Our Priority',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white70,
+                ),
+              ),
+              SizedBox(height: 32),
+              CircularProgressIndicator(color: Colors.white),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+----------------------------------------------------------------------------------
+//home.dart: 
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/admin/admin_panel.dart';
+import 'package:medistore/user/user_panel.dart';
+import 'package:medistore/login.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  final supabase = Supabase.instance.client;
+  bool isLoading = true;
+  bool isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _start(); // call a void function
+  }
+
+  void _start() {
+    _checkRole(); // call async function from inside void function
+  }
+
+  Future<void> _checkRole() async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => LoginScreen()),
+              (_) => false,
+        );
+        return;
+      }
+      final response = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+      setState(() {
+        isAdmin = response['role'] == 'admin';
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return  Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF0F6E56)),
+        ),
+      );
+    }
+    return isAdmin ?  AdminPanel() :  UserPanel();
+  }
+}
+----------------------------------------------------------------------------------
+//login.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/home.dart';
+import 'package:medistore/signup.dart';
+import 'package:medistore/admin/admin_panel.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final EmailText = TextEditingController();
+  final PasswordText = TextEditingController();
+  bool flag = false;
+  bool _obscurePassword = true;
+  final LoginObject = Supabase.instance.client;
+
+  LoginFunction() async {
+
+    if (EmailText.text.trim().isEmpty ||
+        PasswordText.text.trim().isEmpty) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter email and password'),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+      flag = true;
+    });
+
+    try {
+
+      final result = await LoginObject.auth.signInWithPassword(
+        email: EmailText.text.trim(),
+        password: PasswordText.text.trim(),
+      );
+
+      final user = result.user;
+
+      if (user != null) {
+
+        // Fetch profile data
+        final profileData = await LoginObject
+            .from('profiles')
+            .select()
+            .eq('id', user.id)
+            .single();
+
+        String role = profileData['role'];
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login Successful!'),
+          ),
+        );
+
+        // ADMIN LOGIN
+        if (role == 'admin') {
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AdminPanel(),
+            ),
+                (route) => false,
+          );
+        }
+
+        // USER LOGIN
+        else {
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const Home(),
+            ),
+                (route) => false,
+          );
+        }
+      }
+
+    }
+
+    on AuthException catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+        ),
+      );
+    }
+
+    catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong'),
+        ),
+      );
+    }
+
+    finally {
+
+      setState(() {
+        flag = false;
+      });
+    }
+  }
+
+
+  @override
+  void dispose() {
+    EmailText.dispose();
+    PasswordText.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 SizedBox(height: 60),
+                Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 84,
+                        width: 84,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(26),
+                          color:  Color(0xFF0F6E56),
+                        ),
+                        child:  Icon(Icons.local_hospital_rounded,
+                            color: Colors.white, size: 50),
+                      ),
+                       SizedBox(height: 16),
+                       Text('MediStore',
+                          style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0F6E56))),
+                       Text('Your Health Our Priority',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                 SizedBox(height: 40),
+                 Text('Welcome Back!',
+                    style: TextStyle(
+                        fontSize: 26, fontWeight: FontWeight.bold)),
+                 Text('Login to continue',
+                    style: TextStyle(color: Colors.grey, fontSize: 15)),
+                 SizedBox(height: 28),
+                 Text('Email',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15)),
+                 SizedBox(height: 6),
+                TextField(
+                  controller: EmailText,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your email',
+                    prefixIcon:  Icon(Icons.email_outlined,
+                        color: Color(0xFF0F6E56)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:  BorderSide(
+                          color: Color(0xFF0F6E56), width: 2),
+                    ),
+                  ),
+                ),
+                 SizedBox(height: 16),
+                 Text('Password',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15)),
+                 SizedBox(height: 6),
+
+
+            TextField(
+            controller: PasswordText,
+            obscureText: _obscurePassword,
+
+            decoration: InputDecoration(
+              hintText: 'Enter your password',
+
+              prefixIcon: const Icon(
+                Icons.lock_outline,
+                color: Color(0xFF0F6E56),
+              ),
+
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  color: Colors.grey,
+                ),
+
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF0F6E56),
+                  width: 2,
+                ),
+              ),
+            ),
+          ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: double.infinity,
+                  child: flag
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                              color: Color(0xFF0F6E56)))
+                      : ElevatedButton(
+                          onPressed: LoginFunction,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F6E56),
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text('Login',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.white)),
+                        ),
+                ),
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SignupScreen()),
+                    ),
+                    child: const Text(
+                      "Don't have an account? Sign up",
+                      style: TextStyle(
+                          color: Color(0xFF0F6E56),
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+----------------------------------------------------------------------------------
+//signup.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/login.dart';
+
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  bool flag = false;
+  bool _obscurePassword = true;
+  final SignupObject = Supabase.instance.client;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  SignupFunction() async {
+    if (_emailCtrl.text.trim().isEmpty ||
+        _passwordCtrl.text.isEmpty ||
+        _nameCtrl.text.trim().isEmpty) {
+      _showError('All fields are required');
+      return;
+    }
+    if (_passwordCtrl.text.length < 6) {
+      _showError('Password must be at least 6 characters');
+      return;
+    }
+    setState(() => flag = true);
+    try {
+      final result = await SignupObject.auth.signUp(
+        email: _emailCtrl.text.trim(),
+        password: _passwordCtrl.text,
+        data: {'full_name': _nameCtrl.text.trim()},
+      );
+      if (result.user != null) {
+        await SignupObject.from('profiles').insert({
+          'id': result.user!.id,
+          'email': _emailCtrl.text.trim(),
+          'full_name': _nameCtrl.text.trim(),
+          'role': 'user',
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+              (_) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        flag=false;
+      });
+    }
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor:  Color(0xFF0F6E56),
+        leading: IconButton(
+          icon:  Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title:  Text(
+          'Create Account',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding:  EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+             SizedBox(height: 30),
+             Text(
+              'Join MediStore',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+             Text(
+              'Create your account to get started',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+             SizedBox(height: 28),
+             Text(
+              'Full Name',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+             SizedBox(height: 6),
+            TextField(
+              controller: _nameCtrl,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                hintText: 'Enter your full name',
+                prefixIcon:  Icon(
+                  Icons.person_outline,
+                  color: Color(0xFF0F6E56),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:  BorderSide(
+                    color: Color(0xFF0F6E56),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+             SizedBox(height: 16),
+             Text(
+              'Email',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+             SizedBox(height: 6),
+            TextField(
+              controller: _emailCtrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                hintText: 'Enter your email',
+                prefixIcon:  Icon(
+                  Icons.email_outlined,
+                  color: Color(0xFF0F6E56),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:  BorderSide(
+                    color: Color(0xFF0F6E56),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+             SizedBox(height: 16),
+             Text(
+              'Password',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+             SizedBox(height: 6),
+            TextField(
+              controller: _passwordCtrl,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
+                hintText: 'Min. 6 characters',
+                prefixIcon:  Icon(
+                  Icons.lock_outline,
+                  color: Color(0xFF0F6E56),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF0F6E56),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: flag
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF0F6E56),
+                      ),
+                    )
+                  : ElevatedButton(
+                      onPressed: SignupFunction,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F6E56),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Create Account',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
+                child: const Text(
+                  'Already have an account? Login',
+                  style: TextStyle(
+                    color: Color(0xFF0F6E56),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+----------------------------------------------------------------------------------
+//user_panel.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/login.dart';
+import 'package:medistore/user/store_screen.dart';
+import 'package:medistore/user/my_orders_screen.dart';
+import 'package:medistore/user/profile_screen.dart';
+
+class UserPanel extends StatefulWidget {
+  const UserPanel({super.key});
+
+  @override
+  State<UserPanel> createState() => _UserPanelState();
+}
+
+class _UserPanelState extends State<UserPanel> {
+  int _selectedIndex = 0;
+  final supabase = Supabase.instance.client;
+
+  final List<Widget> _screens = [
+     StoreScreen(),
+     MyOrdersScreen(),
+     ProfileScreen(),
+  ];
+
+  _logout() async {
+    await supabase.auth.signOut();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) =>  LoginScreen()),
+        (_) => false,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor:  Color(0xFF0F6E56),
+        elevation: 0,
+        title: Row(
+          children: [
+            Container(
+              height: 36,
+              width: 36,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+              child:  Icon(Icons.local_hospital_rounded,
+                  color: Color(0xFF0F6E56), size: 22),
+            ),
+             SizedBox(width: 10),
+             Text('MediStore',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20)),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon:  Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        selectedItemColor:  Color(0xFF0F6E56),
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle:  TextStyle(fontWeight: FontWeight.bold),
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.store_outlined),
+              activeIcon: Icon(Icons.store),
+              label: 'Store'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long),
+              label: 'My Orders'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+---------------------------------------------------------------------------------
+//store_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class StoreScreen extends StatefulWidget {
+  const StoreScreen({super.key});
+
+  @override
+  State<StoreScreen> createState() => _StoreScreenState();
+}
+
+class _StoreScreenState extends State<StoreScreen> {
+  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> medicines = [];
+  bool isLoading = true;
+  String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicines();
+  }
+
+  Future<void> _loadMedicines() async {
+    setState(() => isLoading = true);
+    try {
+      final data = await supabase
+          .from('medicines')
+          .select()
+          .gt('stock', 0)
+          .order('name');
+      setState(() {
+        medicines = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+    }
+  }
+
+
+
+ _showSuccess(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: Colors.green));
+  }
+
+  _showOrderDialog(Map<String, dynamic> medicine) {
+    int quantity = 1;
+    final maxStock = medicine['stock'] as int? ?? 1;
+    bool placing = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setStateDialog) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title:  Text('Place Order',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding:  EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color:  Color(0xFF0F6E56).withOpacity(0.07),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding:  EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color:  Color(0xFF0F6E56).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child:  Icon(Icons.medication,
+                          color: Color(0xFF0F6E56), size: 28),
+                    ),
+                     SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(medicine['name'] ?? '',
+                              style:  TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text('PKR ${medicine['price']} per unit',
+                              style:  TextStyle(
+                                  color: Color(0xFF0F6E56),
+                                  fontWeight: FontWeight.w600)),
+                          Text('Available: $maxStock units',
+                              style:  TextStyle(
+                                  color: Colors.grey, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+               SizedBox(height: 20),
+               Text('Quantity:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+               SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: quantity > 1
+                        ? () => setStateDialog(() => quantity--)
+                        : null,
+                    icon:  Icon(Icons.remove_circle_outline),
+                    color:  Color(0xFF0F6E56),
+                    iconSize: 32,
+                  ),
+                  Container(
+                    padding:  EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color:  Color(0xFF0F6E56)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('$quantity',
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                  ),
+                  IconButton(
+                    onPressed: quantity < maxStock
+                        ? () => setStateDialog(() => quantity++)
+                        : null,
+                    icon: const Icon(Icons.add_circle_outline),
+                    color: const Color(0xFF0F6E56),
+                    iconSize: 32,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                     Text('Total:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      'PKR ${((medicine['price'] as num) * quantity).toStringAsFixed(0)}',
+                      style:  TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F6E56)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child:  Text('Cancel')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F6E56),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12)),
+              onPressed: placing
+                  ? null
+                  : () async {
+                      setStateDialog(() => placing = true);
+                      try {
+                        final user = supabase.auth.currentUser!;
+                        final total =
+                            (medicine['price'] as num) * quantity;
+                        await supabase.from('orders').insert({
+                          'user_id': user.id,
+                          'medicine_id': medicine['id'],
+                          'quantity': quantity,
+                          'total_price': total,
+                          'status': 'pending',
+                        });
+                        // Update stock
+                        await supabase
+                            .from('medicines')
+                            .update({
+                              'stock': maxStock - quantity
+                            })
+                            .eq('id', medicine['id']);
+
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        _showSuccess('Order placed successfully!');
+                        _loadMedicines();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+                      }
+                      setStateDialog(() => placing = false);
+                    },
+              child: placing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Text('Order Now',
+                      style: TextStyle(color: Colors.white, fontSize: 15)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> get filteredMedicines {
+    if (searchQuery.isEmpty) return medicines;
+    return medicines
+        .where((m) =>
+            m['name']
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()) ||
+            (m['category'] ?? '')
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          color:  Color(0xFF0F6E56).withOpacity(0.05),
+          padding:  EdgeInsets.fromLTRB(12, 12, 12, 12),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search medicines...',
+              prefixIcon:  Icon(Icons.search, color: Color(0xFF0F6E56)),
+              filled: true,
+              fillColor: Colors.white,
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                     BorderSide(color: Color(0xFF0F6E56), width: 2),
+              ),
+            ),
+            onChanged: (v) => setState(() => searchQuery = v),
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ?  Center(
+                  child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+              : filteredMedicines.isEmpty
+                  ?  Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.medication_outlined,
+                              size: 64, color: Colors.grey),
+                          SizedBox(height: 12),
+                          Text('No medicines available',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 16)),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+
+            onRefresh: _loadMedicines,
+                      color: Color(0xFF0F6E56),
+                      child: GridView.builder(
+                        padding:  EdgeInsets.all(12),
+                        gridDelegate:
+                             SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: filteredMedicines.length,
+                        itemBuilder: (_, i) {
+                          final m = filteredMedicines[i];
+                          return GestureDetector(
+                            onTap: () => _showOrderDialog(m),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              elevation: 3,
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 90,
+                                    decoration: BoxDecoration(
+                                      color:  Color(0xFF0F6E56)
+                                          .withOpacity(0.08),
+                                      borderRadius:  BorderRadius.only(
+                                        topLeft: Radius.circular(16),
+                                        topRight: Radius.circular(16),
+                                      ),
+                                    ),
+                                    child:  Center(
+                                      child: Icon(Icons.medication,
+                                          size: 48,
+                                          color: Color(0xFF0F6E56)),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(m['name'] ?? '',
+                                              style:  TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.bold,
+                                                  fontSize: 14),
+                                              maxLines: 2,
+                                              overflow:
+                                                  TextOverflow.ellipsis),
+                                          if (m['category'] != null)
+                                            Text(m['category'],
+                                                style:  TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 11)),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                            children: [
+                                              Text('PKR ${m['price']}',
+                                                  style:  TextStyle(
+                                                      color:
+                                                          Color(0xFF0F6E56),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15)),
+                                              Container(
+                                                padding:  EdgeInsets
+                                                    .symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green
+                                                      .shade50,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6),
+                                                ),
+                                                child: Text(
+                                                    '${m['stock']} left',
+                                                    style: TextStyle(
+                                                        color: Colors.green
+                                                            .shade700,
+                                                        fontSize: 11)),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              style:
+                                                  ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                     Color(0xFF0F6E56),
+                                                padding:
+                                                     EdgeInsets.symmetric(
+                                                        vertical: 6),
+                                                shape:
+                                                    RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8),
+                                                ),
+                                              ),
+                                              onPressed: () =>
+                                                  _showOrderDialog(m),
+                                              child: const Text('Order',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 13)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+        ),
+      ],
+    );
+  }
+}
+----------------------------------------------------------------------------------
+//profile_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/login.dart';
+
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final supabase = Supabase.instance.client;
+  Map<String, dynamic>? profile;
+  bool isLoading = true;
+  bool isSaving = false;
+
+  final nameCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    phoneCtrl.dispose();
+    addressCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() => isLoading = true);
+    try {
+      final user = supabase.auth.currentUser!;
+      final data = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', user.id)
+          .single();
+      setState(() {
+        profile = data;
+        nameCtrl.text = data['full_name'] ?? '';
+        phoneCtrl.text = data['phone'] ?? '';
+        addressCtrl.text = data['address'] ?? '';
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    setState(() => isSaving = true);
+    try {
+      final user = supabase.auth.currentUser!;
+      await supabase.from('profiles').update({
+        'full_name': nameCtrl.text.trim(),
+        'phone': phoneCtrl.text.trim(),
+        'address': addressCtrl.text.trim(),
+      }).eq('id', user.id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Profile updated!'),
+          backgroundColor: Colors.green));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+    }
+    setState(() => isSaving = false);
+  }
+
+  void _logout() async {
+    await supabase.auth.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (_) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = supabase.auth.currentUser;
+    final email = user?.email ?? '';
+    final name =
+        nameCtrl.text.isNotEmpty ? nameCtrl.text : email.split('@')[0];
+    final role = profile?['role'] ?? 'user';
+
+    return isLoading
+        ?  Center(
+            child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+        : SingleChildScrollView(
+            padding:  EdgeInsets.all(16),
+            child: Column(
+              children: [
+                 SizedBox(height: 10),
+                CircleAvatar(
+                  radius: 48,
+                  backgroundColor:  Color(0xFF0F6E56),
+                  child: Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                 SizedBox(height: 12),
+                Text(name,
+                    style:  TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(email,
+                    style:  TextStyle(color: Colors.grey, fontSize: 14)),
+                 SizedBox(height: 6),
+                Container(
+                  padding:  EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color:  Color(0xFF0F6E56).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    role.toUpperCase(),
+                    style:  TextStyle(
+                        color: Color(0xFF0F6E56),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12),
+                  ),
+                ),
+                 SizedBox(height: 28),
+                Container(
+                  padding:  EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 10,
+                        offset:  Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                       Text('Edit Profile',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                       SizedBox(height: 16),
+                      _buildField(nameCtrl, 'Full Name', Icons.person),
+                       SizedBox(height: 12),
+                      _buildField(phoneCtrl, 'Phone Number', Icons.phone,
+                          keyboardType: TextInputType.phone),
+                       SizedBox(height: 12),
+                      _buildField(
+                          addressCtrl, 'Address', Icons.location_on,
+                          maxLines: 2),
+                       SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:  Color(0xFF0F6E56),
+                            padding:
+                                 EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: isSaving ? null : _saveProfile,
+                          child: isSaving
+                              ?  SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2))
+                              :  Text('Save Changes',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                 SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon:  Icon(Icons.logout, color: Colors.red),
+                    label:  Text('Logout',
+                        style: TextStyle(color: Colors.red, fontSize: 16)),
+                    style: OutlinedButton.styleFrom(
+                      side:  BorderSide(color: Colors.red),
+                      padding:  EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: _logout,
+                  ),
+                ),
+                 SizedBox(height: 20),
+              ],
+            ),
+          );
+  }
+
+  Widget _buildField(
+    TextEditingController ctrl,
+    String label,
+    IconData icon, {
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: ctrl,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color:  Color(0xFF0F6E56)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:  BorderSide(color: Color(0xFF0F6E56), width: 2),
+        ),
+      ),
+    );
+  }
+}
+--------------------------------------------------------------------------------
+//my_order_screen.dart
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class MyOrdersScreen extends StatefulWidget {
+  const MyOrdersScreen({super.key});
+
+  @override
+  State<MyOrdersScreen> createState() => _MyOrdersScreenState();
+}
+
+class _MyOrdersScreenState extends State<MyOrdersScreen> {
+  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> orders = [];
+  bool isLoading = true;
+
+  final statusColors = {
+    'pending': Colors.orange,
+    'confirmed': Colors.blue,
+    'delivered': Colors.green,
+    'cancelled': Colors.red,
+  };
+
+  final statusIcons = {
+    'pending': Icons.hourglass_empty,
+    'confirmed': Icons.check_circle_outline,
+    'delivered': Icons.done_all,
+    'cancelled': Icons.cancel_outlined,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    setState(() => isLoading = true);
+    try {
+      final user = supabase.auth.currentUser!;
+      final data = await supabase
+          .from('orders')
+          .select('*, medicines(name, price)')
+          .eq('user_id', user.id)
+          .order('created_at', ascending: false);
+      setState(() {
+        orders = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> _cancelOrder(String id) async {
+    try {
+      await supabase
+          .from('orders')
+          .update({'status': 'cancelled'})
+          .eq('id', id);
+      _showSuccess('Order cancelled');
+      _loadOrders();
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  void _showSuccess(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: Colors.green));
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return '';
+    try {
+      final dt = DateTime.parse(dateStr).toLocal();
+      return '${dt.day}/${dt.month}/${dt.year}  ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return dateStr;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return isLoading
+        ?  Center(
+            child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+        : orders.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(Icons.receipt_long_outlined,
+                        size: 80, color: Colors.grey),
+                     SizedBox(height: 16),
+                     Text('No orders yet',
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: 18)),
+                     SizedBox(height: 8),
+                     Text('Browse the store to place your first order!',
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: 14)),
+                  ],
+                ),
+              )
+            : RefreshIndicator(
+                onRefresh: _loadOrders,
+                color:  Color(0xFF0F6E56),
+                child: ListView.builder(
+                  padding:  EdgeInsets.all(12),
+                  itemCount: orders.length,
+                  itemBuilder: (_, i) {
+                    final o = orders[i];
+                    final status = o['status'] ?? 'pending';
+                    final statusColor =
+                        statusColors[status] ?? Colors.grey;
+                    final statusIcon =
+                        statusIcons[status] ?? Icons.info_outline;
+                    final medicine = o['medicines'] as Map? ?? {};
+                    final canCancel = status == 'pending';
+
+                    return Card(
+                      margin:  EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 2,
+                      child: Padding(
+                        padding:  EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    'Order #${o['id'].toString().substring(0, 8).toUpperCase()}',
+                                    style:  TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14)),
+                                Container(
+                                  padding:  EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withOpacity(0.12),
+                                    borderRadius:
+                                        BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(statusIcon,
+                                          color: statusColor, size: 14),
+                                       SizedBox(width: 4),
+                                      Text(
+                                        status[0].toUpperCase() +
+                                            status.substring(1),
+                                        style: TextStyle(
+                                            color: statusColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                             SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Container(
+                                  padding:  EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color:  Color(0xFF0F6E56)
+                                        .withOpacity(0.08),
+                                    borderRadius:
+                                        BorderRadius.circular(10),
+                                  ),
+                                  child:  Icon(Icons.medication,
+                                      color: Color(0xFF0F6E56), size: 24),
+                                ),
+                                 SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          medicine['name'] ??
+                                              'Unknown Medicine',
+                                          style:  TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15)),
+                                      Text(
+                                          'Qty: ${o['quantity']}  •  PKR ${o['total_price']}',
+                                          style:  TextStyle(
+                                              color: Color(0xFF0F6E56),
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    _formatDate(o['created_at']),
+                                    style: const TextStyle(
+                                        color: Colors.grey, fontSize: 12)),
+                                if (canCancel)
+                                  TextButton.icon(
+                                    onPressed: () =>
+                                        _confirmCancel(o['id'].toString()),
+                                    icon: const Icon(Icons.cancel_outlined,
+                                        size: 16),
+                                    label: const Text('Cancel Order'),
+                                    style: TextButton.styleFrom(
+                                        foregroundColor: Colors.red,
+                                        padding: EdgeInsets.zero),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+  }
+
+  void _confirmCancel(String id) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content:
+            const Text('Are you sure you want to cancel this order?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('No')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(context);
+              _cancelOrder(id);
+            },
+            child: const Text('Yes, Cancel',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+----------------------------------------------------------------------------------
+//admin_panel.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:medistore/login.dart';
+import 'package:medistore/admin/medicines_screen.dart';
+import 'package:medistore/admin/orders_screen.dart';
+import 'package:medistore/admin/users_screen.dart';
+import 'package:medistore/admin/dashboard_screen.dart';
+
+class AdminPanel extends StatefulWidget {
+  const AdminPanel({super.key});
+
+  @override
+  State<AdminPanel> createState() => _AdminPanelState();
+}
+
+class _AdminPanelState extends State<AdminPanel> {
+  int _selectedIndex = 0;
+  final supabase = Supabase.instance.client;
+  final _medicinesKey = GlobalKey<MedicinesScreenState>();
+
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const DashboardScreen(),
+      MedicinesScreen(key: _medicinesKey),
+      const OrdersScreen(),
+      const UsersScreen(),
+    ];
+  }
+
+  void _logout() async {
+    await supabase.auth.signOut();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (_) => false,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0F6E56),
+        elevation: 0,
+        title: Row(
+          children: [
+            Container(
+              height: 36,
+              width: 36,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+              child: const Icon(Icons.local_hospital_rounded,
+                  color: Color(0xFF0F6E56), size: 22),
+            ),
+            const SizedBox(width: 10),
+            const Text('MediStore Admin',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20)),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
+      floatingActionButton: _selectedIndex == 1
+          ? FloatingActionButton.extended(
+              backgroundColor: const Color(0xFF0F6E56),
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Add Medicine',
+                  style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                _medicinesKey.currentState?.showMedicineDialog();
+              },
+            )
+          : null,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        selectedItemColor: const Color(0xFF0F6E56),
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.medication_outlined),
+              activeIcon: Icon(Icons.medication),
+              label: 'Medicines'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long),
+              label: 'Orders'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline),
+              activeIcon: Icon(Icons.people),
+              label: 'Users'),
+        ],
+      ),
+    );
+  }
+}
+---------------------------------------------------------------------------------
+//dashboard_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  final supabase = Supabase.instance.client;
+  int totalMedicines = 0;
+  int totalOrders = 0;
+  int totalUsers = 0;
+  int lowStockCount = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    setState(() => isLoading = true);
+    try {
+      final medicines = await supabase.from('medicines').select('id, stock');
+      final orders = await supabase.from('orders').select('id');
+      final users = await supabase.from('profiles').select('id');
+
+      setState(() {
+        totalMedicines = medicines.length;
+        totalOrders = orders.length;
+        totalUsers = users.length;
+        lowStockCount =
+            medicines.where((m) => (m['stock'] as int? ?? 0) < 10).length;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: _loadStats,
+      color:  Color(0xFF0F6E56),
+      child: isLoading
+          ?  Center(
+              child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+          : SingleChildScrollView(
+              physics:  AlwaysScrollableScrollPhysics(),
+              padding:  EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Text('Overview',
+                      style: TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                   SizedBox(height: 4),
+                   Text('Welcome back, Admin!',
+                      style: TextStyle(color: Colors.grey, fontSize: 14)),
+                   SizedBox(height: 20),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics:  NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    children: [
+                      _StatCard(
+                        title: 'Total Medicines',
+                        value: '$totalMedicines',
+                        icon: Icons.medication,
+                        color:  Color(0xFF0F6E56),
+                      ),
+                      _StatCard(
+                        title: 'Total Orders',
+                        value: '$totalOrders',
+                        icon: Icons.receipt_long,
+                        color: Colors.blue,
+                      ),
+                      _StatCard(
+                        title: 'Total Users',
+                        value: '$totalUsers',
+                        icon: Icons.people,
+                        color: Colors.purple,
+                      ),
+                      _StatCard(
+                        title: 'Low Stock',
+                        value: '$lowStockCount',
+                        icon: Icons.warning_amber_rounded,
+                        color: Colors.orange,
+                      ),
+                    ],
+                  ),
+                   SizedBox(height: 24),
+                  if (lowStockCount > 0)
+                    Container(
+                      padding:  EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                           Icon(Icons.warning_amber_rounded,
+                              color: Colors.orange),
+                           SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '$lowStockCount medicine(s) are running low on stock. Please restock soon.',
+                              style:
+                                   TextStyle(color: Colors.orange),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset:  Offset(0, 4),
+          ),
+        ],
+      ),
+      padding:  EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding:  EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value,
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: color)),
+              Text(title,
+                  style:
+                       TextStyle(color: Colors.grey, fontSize: 13)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+---------------------------------------------------------------------------------
+//order_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class OrdersScreen extends StatefulWidget {
+  const OrdersScreen({super.key});
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> orders = [];
+  bool isLoading = true;
+  String selectedStatus = 'All';
+
+  final statusOptions = ['All', 'pending', 'confirmed', 'delivered', 'cancelled'];
+
+  final statusColors = {
+    'pending': Colors.orange,
+    'confirmed': Colors.blue,
+    'delivered': Colors.green,
+    'cancelled': Colors.red,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    setState(() => isLoading = true);
+    try {
+      var query = supabase
+          .from('orders')
+          .select('*, medicines(name), profiles(email)')
+          .order('created_at', ascending: false);
+
+      final data = await query;
+      setState(() {
+        orders = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> _updateOrderStatus(String id, String status) async {
+    try {
+      await supabase
+          .from('orders')
+          .update({'status': status})
+          .eq('id', id);
+      _showSuccess('Order status updated');
+      _loadOrders();
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  void _showSuccess(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.green));
+  }
+
+  List<Map<String, dynamic>> get filteredOrders {
+    if (selectedStatus == 'All') return orders;
+    return orders.where((o) => o['status'] == selectedStatus).toList();
+  }
+
+  void _showStatusDialog(Map<String, dynamic> order) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title:  Text('Update Status'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ['pending', 'confirmed', 'delivered', 'cancelled']
+              .map((s) => ListTile(
+                    title: Text(s[0].toUpperCase() + s.substring(1)),
+                    leading: Radio<String>(
+                      value: s,
+                      groupValue: order['status'],
+                      activeColor:  Color(0xFF0F6E56),
+                      onChanged: (v) {
+                        Navigator.pop(context);
+                        _updateOrderStatus(order['id'].toString(), v!);
+                      },
+                    ),
+                  ))
+              .toList(),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:  Text('Cancel')),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 50,
+          margin:  EdgeInsets.symmetric(vertical: 8),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding:  EdgeInsets.symmetric(horizontal: 12),
+            itemCount: statusOptions.length,
+            itemBuilder: (_, i) {
+              final s = statusOptions[i];
+              final isSelected = s == selectedStatus;
+              return GestureDetector(
+                onTap: () => setState(() => selectedStatus = s),
+                child: Container(
+                  margin:  EdgeInsets.only(right: 8),
+                  padding:
+                       EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ?  Color(0xFF0F6E56)
+                        : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    s[0].toUpperCase() + s.substring(1),
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ?  Center(
+                  child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+              : filteredOrders.isEmpty
+                  ?  Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.receipt_long_outlined,
+                              size: 64, color: Colors.grey),
+                          SizedBox(height: 12),
+                          Text('No orders found',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 16)),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadOrders,
+                      color:  Color(0xFF0F6E56),
+                      child: ListView.builder(
+                        padding:  EdgeInsets.symmetric(horizontal: 12),
+                        itemCount: filteredOrders.length,
+                        itemBuilder: (_, i) {
+                          final o = filteredOrders[i];
+                          final status = o['status'] ?? 'pending';
+                          final statusColor =
+                              statusColors[status] ?? Colors.grey;
+                          final medicine = o['medicines'] as Map? ?? {};
+                          final profile = o['profiles'] as Map? ?? {};
+
+                          return Card(
+                            margin:  EdgeInsets.only(bottom: 10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                            elevation: 2,
+                            child: Padding(
+                              padding:  EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          'Order #${o['id'].toString().substring(0, 8).toUpperCase()}',
+                                          style:  TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15)),
+                                      Container(
+                                        padding:  EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              statusColor.withOpacity(0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          status[0].toUpperCase() +
+                                              status.substring(1),
+                                          style: TextStyle(
+                                              color: statusColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                   SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                       Icon(Icons.medication,
+                                          size: 16, color: Colors.grey),
+                                       SizedBox(width: 4),
+                                      Text(
+                                          medicine['name'] ??
+                                              'Unknown Medicine',
+                                          style:  TextStyle(
+                                              color: Colors.black87)),
+                                    ],
+                                  ),
+                                   SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                       Icon(Icons.person,
+                                          size: 16, color: Colors.grey),
+                                       SizedBox(width: 4),
+                                      Text(
+                                          profile['email'] ??
+                                              'Unknown User',
+                                          style:  TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13)),
+                                    ],
+                                  ),
+                                   SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          'Qty: ${o['quantity']}  •  PKR ${o['total_price']}',
+                                          style:  TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF0F6E56))),
+                                      TextButton.icon(
+                                        onPressed: () =>
+                                            _showStatusDialog(o),
+                                        icon:  Icon(Icons.edit,
+                                            size: 16),
+                                        label:  Text('Update'),
+                                        style: TextButton.styleFrom(
+                                            foregroundColor:
+                                                 Color(0xFF0F6E56)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+        ),
+      ],
+    );
+  }
+}
+----------------------------------------------------------------------------------------------
+//medicines_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class MedicinesScreen extends StatefulWidget {
+  const MedicinesScreen({super.key});
+
+  @override
+  State<MedicinesScreen> createState() => MedicinesScreenState();
+}
+
+class MedicinesScreenState extends State<MedicinesScreen> {
+  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> medicines = [];
+  bool isLoading = true;
+  String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    loadMedicines();
+  }
+
+  Future<void> loadMedicines() async {
+    setState(() => isLoading = true);
+    try {
+      final data = await supabase
+          .from('medicines')
+          .select()
+          .order('created_at', ascending: false);
+      setState(() {
+        medicines = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> deleteMedicine(String id) async {
+    try {
+      await supabase.from('medicines').delete().eq('id', id);
+      _showSuccess('Medicine deleted successfully');
+      loadMedicines();
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  void _showSuccess(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.green));
+  }
+
+  void showMedicineDialog({Map<String, dynamic>? medicine}) {
+    final nameCtrl = TextEditingController(text: medicine?['name'] ?? '');
+    final descCtrl = TextEditingController(text: medicine?['description'] ?? '');
+    final priceCtrl =
+        TextEditingController(text: medicine?['price']?.toString() ?? '');
+    final stockCtrl =
+        TextEditingController(text: medicine?['stock']?.toString() ?? '');
+    final categoryCtrl =
+        TextEditingController(text: medicine?['category'] ?? '');
+    final manufacturerCtrl =
+        TextEditingController(text: medicine?['manufacturer'] ?? '');
+    bool saving = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setStateDialog) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(medicine == null ? 'Add Medicine' : 'Edit Medicine',
+              style:  TextStyle(fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildField(nameCtrl, 'Medicine Name', Icons.medication),
+                 SizedBox(height: 12),
+                _buildField(descCtrl, 'Description', Icons.description, maxLines: 2),
+                 SizedBox(height: 12),
+                _buildField(categoryCtrl, 'Category', Icons.category),
+                 SizedBox(height: 12),
+                _buildField(manufacturerCtrl, 'Manufacturer', Icons.business),
+                 SizedBox(height: 12),
+                _buildField(priceCtrl, 'Price (PKR)', Icons.attach_money,
+                    keyboardType: TextInputType.number),
+                 SizedBox(height: 12),
+                _buildField(stockCtrl, 'Stock Quantity', Icons.inventory_2,
+                    keyboardType: TextInputType.number),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child:  Text('Cancel')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:  Color(0xFF0F6E56)),
+              onPressed: saving
+                  ? null
+                  : () async {
+                      if (nameCtrl.text.trim().isEmpty ||
+                          priceCtrl.text.trim().isEmpty ||
+                          stockCtrl.text.trim().isEmpty) {
+                        _showError('Name, price and stock are required');
+                        return;
+                      }
+                      setStateDialog(() => saving = true);
+                      try {
+                        final payload = {
+                          'name': nameCtrl.text.trim(),
+                          'description': descCtrl.text.trim(),
+                          'category': categoryCtrl.text.trim(),
+                          'manufacturer': manufacturerCtrl.text.trim(),
+                          'price': double.tryParse(priceCtrl.text) ?? 0,
+                          'stock': int.tryParse(stockCtrl.text) ?? 0,
+                        };
+                        if (medicine == null) {
+                          await supabase.from('medicines').insert(payload);
+                          _showSuccess('Medicine added successfully');
+                        } else {
+                          await supabase
+                              .from('medicines')
+                              .update(payload)
+                              .eq('id', medicine['id']);
+                          _showSuccess('Medicine updated successfully');
+                        }
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        loadMedicines();
+                      } catch (e) {
+                        _showError(e.toString());
+                      }
+                      setStateDialog(() => saving = false);
+                    },
+              child: saving
+                  ?  SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : Text(medicine == null ? 'Add' : 'Update',
+                      style:  TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField(
+    TextEditingController ctrl,
+    String label,
+    IconData icon, {
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: ctrl,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color:  Color(0xFF0F6E56)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:  BorderSide(color: Color(0xFF0F6E56), width: 2),
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> get filteredMedicines {
+    if (searchQuery.isEmpty) return medicines;
+    return medicines
+        .where((m) =>
+            m['name']
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()) ||
+            (m['category'] ?? '')
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  void confirmDelete(String id) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title:  Text('Delete Medicine'),
+        content:  Text('Are you sure you want to delete this medicine?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child:  Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(context);
+              deleteMedicine(id);
+            },
+            child:  Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding:  EdgeInsets.all(12),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search by name or category...',
+              prefixIcon:  Icon(Icons.search, color: Color(0xFF0F6E56)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:  BorderSide(color: Color(0xFF0F6E56), width: 2),
+              ),
+            ),
+            onChanged: (v) => setState(() => searchQuery = v),
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ?  Center(
+                  child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+              : filteredMedicines.isEmpty
+                  ?  Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.medication_outlined,
+                              size: 64, color: Colors.grey),
+                          SizedBox(height: 12),
+                          Text('No medicines found',
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 16)),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: loadMedicines,
+                      color:  Color(0xFF0F6E56),
+                      child: ListView.builder(
+                        padding:  EdgeInsets.symmetric(horizontal: 12),
+                        itemCount: filteredMedicines.length,
+                        itemBuilder: (_, i) {
+                          final m = filteredMedicines[i];
+                          final isLowStock = (m['stock'] as int? ?? 0) < 10;
+                          return Card(
+                            margin:  EdgeInsets.only(bottom: 10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                            elevation: 2,
+                            child: ListTile(
+                              contentPadding:  EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              leading: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color:
+                                       Color(0xFF0F6E56).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child:  Icon(Icons.medication,
+                                    color: Color(0xFF0F6E56)),
+                              ),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(m['name'] ?? '',
+                                        style:  TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  if (isLowStock)
+                                    Container(
+                                      padding:  EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.shade100,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child:  Text('Low Stock',
+                                          style: TextStyle(
+                                              color: Colors.orange,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                   SizedBox(height: 4),
+                                  Text(
+                                      'Category: ${m['category'] ?? 'N/A'}  •  ${m['manufacturer'] ?? ''}',
+                                      style:  TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Text(
+                                      'PKR ${m['price']}  •  Stock: ${m['stock']}',
+                                      style:  TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF0F6E56))),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon:  Icon(Icons.edit,
+                                        color: Colors.blue),
+                                    onPressed: () =>
+                                        showMedicineDialog(medicine: m),
+                                  ),
+                                  IconButton(
+                                    icon:  Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () =>
+                                        confirmDelete(m['id'].toString()),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+        ),
+      ],
+    );
+  }
+}
+---------------------------------------------------------------------------------------------
+//users_screen.dart:
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class UsersScreen extends StatefulWidget {
+  const UsersScreen({super.key});
+
+  @override
+  State<UsersScreen> createState() => _UsersScreenState();
+}
+
+class _UsersScreenState extends State<UsersScreen> {
+  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> users = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    setState(() => isLoading = true);
+    try {
+      final data = await supabase
+          .from('profiles')
+          .select()
+          .order('created_at', ascending: false);
+      setState(() {
+        users = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> _toggleRole(String id, String currentRole) async {
+    final newRole = currentRole == 'admin' ? 'user' : 'admin';
+    try {
+      await supabase
+          .from('profiles')
+          .update({'role': newRole})
+          .eq('id', id);
+      _showSuccess('Role updated to $newRole');
+      _loadUsers();
+    } catch (e) {
+      _showError(e.toString());
+    }
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+
+  void _showSuccess(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: Colors.green));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(color: Color(0xFF0F6E56)))
+        : users.isEmpty
+            ? const Center(
+                child: Text('No users found',
+                    style: TextStyle(color: Colors.grey, fontSize: 16)))
+            : RefreshIndicator(
+                onRefresh: _loadUsers,
+                color: const Color(0xFF0F6E56),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: users.length,
+                  itemBuilder: (_, i) {
+                    final u = users[i];
+                    final role = u['role'] ?? 'user';
+                    final isAdmin = role == 'admin';
+                    final email = u['email'] ?? 'N/A';
+                    final name = u['full_name'] ?? email.split('@')[0];
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                      elevation: 2,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        leading: CircleAvatar(
+                          backgroundColor: isAdmin
+                              ? const Color(0xFF0F6E56)
+                              : Colors.blue.shade100,
+                          child: Text(
+                            name.isNotEmpty
+                                ? name[0].toUpperCase()
+                                : '?',
+                            style: TextStyle(
+                              color: isAdmin ? Colors.white : Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        title: Text(name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold)),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(email,
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 13)),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isAdmin
+                                    ? const Color(0xFF0F6E56)
+                                        .withOpacity(0.1)
+                                    : Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                role.toUpperCase(),
+                                style: TextStyle(
+                                  color: isAdmin
+                                      ? const Color(0xFF0F6E56)
+                                      : Colors.blue,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: PopupMenuButton<String>(
+                          onSelected: (v) {
+                            if (v == 'toggle') {
+                              _confirmToggleRole(
+                                  u['id'].toString(), role);
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            PopupMenuItem(
+                              value: 'toggle',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isAdmin
+                                        ? Icons.person_remove
+                                        : Icons.admin_panel_settings,
+                                    color: isAdmin
+                                        ? Colors.red
+                                        : const Color(0xFF0F6E56),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(isAdmin
+                                      ? 'Remove Admin'
+                                      : 'Make Admin'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+  }
+
+  void _confirmToggleRole(String id, String currentRole) {
+    final newRole = currentRole == 'admin' ? 'user' : 'admin';
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Change Role'),
+        content:
+            Text('Change this user\'s role to "$newRole"?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F6E56)),
+            onPressed: () {
+              Navigator.pop(context);
+              _toggleRole(id, currentRole);
+            },
+            child: const Text('Confirm',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+}
