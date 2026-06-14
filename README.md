@@ -4,11 +4,11 @@
 
 ---
 
-<img src="./images/r1.png">
+<img src="./images/r1.PNG">
 
 ---
 
-<img style="border: 1px solid black;" src="./images/r2.png">
+<img style="border: 1px solid black;" src="./images/r2.PNG">
 
 ---
 
